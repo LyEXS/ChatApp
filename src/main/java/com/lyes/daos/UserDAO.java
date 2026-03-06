@@ -14,7 +14,6 @@ public class UserDAO {
 
     /**
      * Vérifie les identifiants d'un utilisateur.
-     * @return true si le couple username/password est correct.
      */
     public boolean checkUser(Utilisateur utilisateur) {
         String query = "SELECT * FROM Utilisateur WHERE username = ? AND password = ?";
@@ -33,7 +32,6 @@ public class UserDAO {
 
     /**
      * Authentifie un utilisateur et retourne l'objet complet (avec son id) depuis la BDD.
-     * @return l'Utilisateur trouvé ou null si les identifiants sont incorrects.
      */
     public Utilisateur authenticate(String username, String password) {
         String query = "SELECT id_utilisateur, username, password FROM Utilisateur WHERE username = ? AND password = ?";
@@ -100,5 +98,18 @@ public class UserDAO {
             System.err.println("Erreur lors de la récupération de l'utilisateur : " + e.getMessage());
         }
         return null;
+    }
+
+    public void createUser(Utilisateur user) {
+        String query = "INSERT INTO Utilisateur(id_utilisateur, username, password) VALUES (?, ?, ?)";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setString(1, user.getIdUtilisateur());
+            ps.setString(2, user.getUsername());
+            ps.setString(3, user.getPassword());
+            ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

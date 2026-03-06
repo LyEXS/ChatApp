@@ -34,7 +34,7 @@ public class ConversationDAO {
     /**
      * Met à jour le nom et le type (groupe ou non) d'une conversation existante.
      */
-    public boolean editConversation(Conversation conversation) {
+    public void editConversation(Conversation conversation) {
         String query = "UPDATE Conversation SET nom = ?, est_groupe = ? WHERE id_conversation = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
@@ -42,10 +42,9 @@ public class ConversationDAO {
             ps.setBoolean(2, conversation.getEstGroupe() != null ? conversation.getEstGroupe() : false);
             ps.setString(3, conversation.getIdConversation());
             int rows = ps.executeUpdate();
-            return rows > 0;
+
         } catch (SQLException e) {
             System.err.println("Erreur lors de la modification de la conversation : " + e.getMessage());
-            return false;
         }
     }
 
