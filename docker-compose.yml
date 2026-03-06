@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: chat-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-chat_db}
+      MYSQL_USER: ${DB_USER:-chatuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-chatpassword}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - chat-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  server:
+    build: .
+    container_name: chat-server
+    restart: unless-stopped
+    ports:
+      - "2026:2026"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-chat_db}
+      DB_USER: ${DB_USER:-chatuser}
+      DB_PASSWORD: ${DB_PASSWORD:-chatpassword}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - chat-network
+
+volumes:
+  mysql_data:
+
+networks:
+  chat-network:
+    driver: bridge
