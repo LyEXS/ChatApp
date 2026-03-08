@@ -1,5 +1,6 @@
 package com.lyes.handlers;
 
+import com.lyes.models.Conversation;
 import com.lyes.models.Message;
 import com.lyes.models.Packet;
 import com.lyes.models.Utilisateur;
@@ -31,6 +32,7 @@ public class MessageHandler implements PacketHandler {
         switch (packet.getType()) {
             case NEW_MESSAGE -> handleNewMessage(packet, session);
             case MESSAGES -> handleGetMessages(packet, session);
+            case MESSAGE_READ -> handleMessageRead(packet,session);
             default -> {}
         }
     }
@@ -55,7 +57,42 @@ public class MessageHandler implements PacketHandler {
         System.out.println("Message de " + session.getCurrentUser().getUsername()
                 + " envoyé dans la conversation " + message.getIdConversation());
     }
+    private void handleMessageRead(Packet packet, ClientSession session){
+        System.out.println("un message a été vu");
+        if (session.getCurrentUser() == null) return;
 
+        Message message = JsonUtils.deserialize(packet.getData(), Message.class);
+        if (message == null) {
+            System.out.println("[MESSAGE_READ] message désérialisé est null");
+            return;
+        }
+        System.out.println("[MESSAGE_READ] idMessage=" + message.getIdMessage());
+
+        Conversation conversation = conversationService.getConversationByMessage(message);
+        if (conversation == null) {
+            System.out.println("[MESSAGE_READ] conversation introuvable pour le message " + message.getIdMessage());
+            return;
+        }
+        System.out.println("[MESSAGE_READ] conversation trouvée : " + conversation.getIdConversation());
+
+        Conversation fullConversation = conversationService.loadFullConversation(conversation.getIdConversation());
+        if (fullConversation == null) {
+            System.out.println("[MESSAGE_READ] fullConversation est null");
+            return;
+        }
+
+        List<Utilisateur> concernedUsers = fullConversation.getParticipants();
+        if (concernedUsers == null) {
+            System.out.println("[MESSAGE_READ] participants est null");
+            return;
+        }
+        System.out.println("[MESSAGE_READ] envoi MESSAGE_READ à " + concernedUsers.size() + " participants");
+
+        Packet packetToSend = new Packet(Packet.Type.MESSAGE_READ, message.getIdMessage());
+        for(Utilisateur user : concernedUsers){
+            sessionManager.sendToUser(user.getIdUtilisateur(), JsonUtils.serialize(packetToSend));
+        }
+    }
     private void handleGetMessages(Packet packet, ClientSession session) {
         if (session.getCurrentUser() == null) return;
 

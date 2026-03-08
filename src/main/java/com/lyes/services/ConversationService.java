@@ -4,6 +4,7 @@ import com.lyes.daos.ConversationDAO;
 import com.lyes.daos.MessageDAO;
 import com.lyes.daos.UtilisateurConversationDAO;
 import com.lyes.models.Conversation;
+import com.lyes.models.Message;
 import com.lyes.models.Utilisateur;
 import com.lyes.session.SessionManager;
 
@@ -47,6 +48,10 @@ public class ConversationService {
             conv.setParticipants(participants);
         }
         return conversations;
+    }
+
+    public Conversation getConversationByMessage(Message message){
+        return conversationDAO.getConversationByMessage(message);
     }
 
     public Conversation findPrivateConversation(String userId1, String userId2) {

@@ -8,6 +8,7 @@ public class Message {
     private String idConversation;
     private String idUtilisateur;
     private String content;
+    private boolean read;
     private Timestamp dateTime;
 
     public Message() {}
@@ -20,12 +21,13 @@ public class Message {
         this.dateTime = new Timestamp(System.currentTimeMillis());
     }
 
-    public Message(String idMessage, String idConversation, String idUtilisateur, String content, Timestamp dateTime) {
+    public Message(String idMessage, String idConversation, String idUtilisateur, String content, Timestamp dateTime, boolean read) {
         this.idMessage = idMessage;
         this.idConversation = idConversation;
         this.idUtilisateur = idUtilisateur;
         this.content = content;
         this.dateTime = dateTime;
+        this.read = read ;
     }
 
     public String getIdMessage() { return idMessage; }
@@ -38,4 +40,12 @@ public class Message {
     public void setContent(String content) { this.content = content; }
     public Timestamp getDateTime() { return dateTime; }
     public void setDateTime(Timestamp dateTime) { this.dateTime = dateTime; }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
 }

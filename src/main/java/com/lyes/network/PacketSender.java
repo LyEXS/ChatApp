@@ -18,6 +18,7 @@ public class PacketSender {
 
     public synchronized void sendJson(String json) {
         if (out != null) {
+            System.out.println("Envoyé : " + json);
             out.println(json);
         }
     }

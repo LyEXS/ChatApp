@@ -32,7 +32,7 @@ public class MessageDAO {
      */
     public List<Message> getMessagesByConversation(String idConversation) {
         List<Message> messages = new ArrayList<>();
-        String query = "SELECT id_message, id_conversation, id_utilisateur, content, date_time FROM Message WHERE id_conversation = ? ORDER BY date_time ASC";
+        String query = "SELECT id_message, id_conversation, id_utilisateur, content, date_time, `read` FROM Message WHERE id_conversation = ? ORDER BY date_time ASC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, idConversation);
@@ -43,7 +43,8 @@ public class MessageDAO {
                             rs.getString("id_conversation"),
                             rs.getString("id_utilisateur"),
                             rs.getString("content"),
-                            rs.getTimestamp("date_time")
+                            rs.getTimestamp("date_time"),
+                            rs.getBoolean("read")
                     );
                     messages.add(m);
                 }

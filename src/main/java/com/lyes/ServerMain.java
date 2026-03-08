@@ -44,7 +44,7 @@ public class ServerMain {
         // Router
         PacketRouter router = new PacketRouter();
         router.register(authHandler, Packet.Type.AUTH, Packet.Type.SIGNUP);
-        router.register(messageHandler, Packet.Type.NEW_MESSAGE, Packet.Type.MESSAGES);
+        router.register(messageHandler, Packet.Type.NEW_MESSAGE, Packet.Type.MESSAGES, Packet.Type.MESSAGE_READ);
         router.register(conversationHandler,
                 Packet.Type.CONVERSATIONS, Packet.Type.NEW_CONVERSATION, Packet.Type.NEW_CONVERSATION_USER,
                 Packet.Type.EDIT_CONVERSATION, Packet.Type.ADD_MEMBER_TO_CONVERSATION, Packet.Type.ONLINE_CLIENTS);

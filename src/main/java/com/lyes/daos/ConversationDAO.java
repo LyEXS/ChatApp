@@ -2,6 +2,7 @@ package com.lyes.daos;
 
 import com.lyes.db.DatabaseConnection;
 import com.lyes.models.Conversation;
+import com.lyes.models.Message;
 import com.lyes.models.Utilisateur;
 
 import java.sql.Connection;
@@ -113,6 +114,33 @@ public class ConversationDAO {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche de conversation privée : " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Récupère une conversation à partir d'un message (via son id_conversation).
+     */
+    public Conversation getConversationByMessage(Message message) {
+        String idMessage = message.getIdMessage();
+        String query = "SELECT c.id_conversation, c.nom, c.est_groupe " +
+                "FROM Conversation c " +
+                "INNER JOIN Message m ON c.id_conversation = m.id_conversation " +
+                "WHERE m.id_message = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, idMessage);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Conversation(
+                            rs.getString("id_conversation"),
+                            rs.getString("nom"),
+                            rs.getBoolean("est_groupe")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération de la conversation par message : " + e.getMessage());
         }
         return null;
     }
