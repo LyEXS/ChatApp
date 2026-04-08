@@ -1,9 +1,6 @@
 package com.lyes.handlers;
 
-import com.lyes.models.Conversation;
-import com.lyes.models.Message;
-import com.lyes.models.Packet;
-import com.lyes.models.Utilisateur;
+import com.lyes.models.*;
 import com.lyes.services.ConversationService;
 import com.lyes.services.MessageService;
 import com.lyes.session.ClientSession;
@@ -50,8 +47,15 @@ public class MessageHandler implements PacketHandler {
         Packet msgPacket = new Packet(Packet.Type.NEW_MESSAGE, JsonUtils.serialize(message));
         String json = JsonUtils.serialize(msgPacket);
 
+
+        Notification notification = new Notification("Nouveau Message!","Vous avez reçu un nouveau message!!",participants);
+        Packet notifactionPacket = new Packet(Packet.Type.NOTIFICATION, JsonUtils.serialize(notification));
+
         for (Utilisateur participant : participants) {
             sessionManager.sendToUser(participant.getIdUtilisateur(), json);
+            if (!participant.getIdUtilisateur().equalsIgnoreCase(session.getCurrentUser().getIdUtilisateur())){
+                sessionManager.sendToUser(participant.getIdUtilisateur(),JsonUtils.serialize(notifactionPacket));
+            }
         }
 
         System.out.println("Message de " + session.getCurrentUser().getUsername()
